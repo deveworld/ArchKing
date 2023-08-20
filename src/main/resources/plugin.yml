@@ -1,0 +1,9 @@
+name: $name
+version: $version
+main: dev.worldsw.archKing.ArchKingPlugin
+description: $description
+author: devworld
+api-version: "$apiVersion"
+
+bootstrapper: dev.worldsw.archKing.ArchKingBootstrap
+loader: dev.worldsw.archKing.ArchKingLoader
