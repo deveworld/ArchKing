@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "dev.worldsw"
-version = "1.0-RC2"
+version = "1.0.0"
 description = "The plugin for the architecture king(YouTuber)."
 
 repositories {
@@ -74,6 +74,7 @@ tasks {
     shadowJar {
         dependencies {
             include(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
+            include(dependency("org.jetbrains.kotlin:kotlin-reflect"))
         }
     }
 

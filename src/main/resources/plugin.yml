@@ -5,5 +5,17 @@ description: $description
 author: devworld
 api-version: "$apiVersion"
 
+permissions :
+  archkingitem.get:
+    description: "This is a permission to get arch king item"
+    default: op
+
+commands:
+  archkingitem:
+    description: "Get arch king item"
+    usage: "/archkingitem <item> <quantity>"
+    permission: archkingitem.get
+    permission-message: "You do not have permission to use this command"
+
 bootstrapper: dev.worldsw.archKing.ArchKingBootstrap
 loader: dev.worldsw.archKing.ArchKingLoader

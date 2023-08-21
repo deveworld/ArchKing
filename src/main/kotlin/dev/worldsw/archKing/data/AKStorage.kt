@@ -8,13 +8,14 @@ import java.io.File
 import java.io.FileOutputStream
 import java.nio.charset.Charset
 
-class DataManager(private val plugin: ArchKingPlugin) {
+class AKStorage(private val plugin: ArchKingPlugin) {
     private lateinit var data: JsonObject
     private var memory: JsonObject = JsonObject()
 
     companion object {
         const val REBARS = "rebars"
         const val CUSTOM_ITEM = "custom_item"
+
         const val READY_MIXED_CONCRETE_HARD = "rmc_hard"
     }
 
@@ -37,6 +38,11 @@ class DataManager(private val plugin: ArchKingPlugin) {
         if (!data.has(CUSTOM_ITEM)) {
             val rebars = JsonObject()
             data.add(CUSTOM_ITEM, rebars)
+        }
+
+        if (!memory.has(READY_MIXED_CONCRETE_HARD)) {
+            val rmc = JsonObject()
+            memory.add(READY_MIXED_CONCRETE_HARD, rmc)
         }
     }
 

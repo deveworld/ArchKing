@@ -2,7 +2,7 @@ package dev.worldsw.archKing.rebar
 
 import com.google.gson.JsonObject
 import dev.worldsw.archKing.ArchKingPlugin
-import dev.worldsw.archKing.data.DataManager
+import dev.worldsw.archKing.data.AKStorage
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.BlockDisplay
@@ -13,7 +13,7 @@ import org.joml.AxisAngle4f
 import org.joml.Vector3f
 import java.util.*
 
-class RebarHandler(private val plugin: ArchKingPlugin) {
+class AKRebar(private val plugin: ArchKingPlugin) {
     private fun promiseBlock(blockDisplay: BlockDisplay, transformation: Transformation) {
         plugin.server.scheduler.scheduleSyncDelayedTask(plugin, {
             blockDisplay.transformation = transformation
@@ -27,7 +27,7 @@ class RebarHandler(private val plugin: ArchKingPlugin) {
     }
 
     fun onPlaceRebar(block: Block) {
-        if (plugin.dataManager.getData(DataManager.REBARS, block.location.toBlockLocation().toString()) != null) return
+        if (plugin.storage.getData(AKStorage.REBARS, block.location.toBlockLocation().toString()) != null) return
 
         val world = block.world
         val location = block.location
@@ -45,16 +45,16 @@ class RebarHandler(private val plugin: ArchKingPlugin) {
         data.addProperty("rebar", rebar.uniqueId.toString())
         data.addProperty("rebarInteraction", rebarInteraction.uniqueId.toString())
 
-        plugin.dataManager.addData(DataManager.REBARS, location.toBlockLocation().toString(), data)
+        plugin.storage.addData(AKStorage.REBARS, location.toBlockLocation().toString(), data)
     }
 
     fun onBreakRebar(entity: Entity) {
         val location = entity.location.toBlockLocation().toString()
-        val data = plugin.dataManager.getData(DataManager.REBARS, location)
+        val data = plugin.storage.getData(AKStorage.REBARS, location)
         for (model in data!!.asJsonObject.entrySet()) {
             val modelUUID = model.value.asString
             entity.world.getEntity(UUID.fromString(modelUUID))!!.remove()
         }
-        plugin.dataManager.removeData(DataManager.REBARS, location)
+        plugin.storage.removeData(AKStorage.REBARS, location)
     }
 }
