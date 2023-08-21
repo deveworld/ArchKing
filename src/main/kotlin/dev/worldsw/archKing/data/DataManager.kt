@@ -15,6 +15,7 @@ class DataManager(private val plugin: ArchKingPlugin) {
     companion object {
         const val REBARS = "rebars"
         const val CUSTOM_ITEM = "custom_item"
+        const val READY_MIXED_CONCRETE_HARD = "rmc_hard"
     }
 
     fun init() {
@@ -37,6 +38,22 @@ class DataManager(private val plugin: ArchKingPlugin) {
             val rebars = JsonObject()
             data.add(CUSTOM_ITEM, rebars)
         }
+    }
+
+    fun addMemory(property: String, inputProperty: String, value: JsonElement) {
+        getMemory(property).asJsonObject.add(inputProperty, value)
+    }
+
+    fun getMemory(property: String): JsonElement {
+        return memory.get(property)
+    }
+
+    fun getMemory(property: String, secondProperty: String): JsonElement? {
+        return memory.get(property).asJsonObject?.get(secondProperty)
+    }
+
+    fun removeMemory(property: String, removeProperty: String) {
+        getMemory(property).asJsonObject.remove(removeProperty)
     }
 
     fun addData(property: String, inputProperty: String, value: JsonElement) {
