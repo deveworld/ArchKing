@@ -40,6 +40,7 @@ class AKBlock(private val plugin: ArchKingPlugin) {
             plugin.akBlock.removeCustomBlockData(block)
             plugin.akBlock.addCustomBlockData(block, AKItemType.CONCRETE)
             block.type = plugin.akItem.getItem(AKItemType.CONCRETE).type
+            plugin.storage.removeMemory(AKStorage.READY_MIXED_CONCRETE_HARD, block.location.toString())
         }, (3600 + (-600..600).random()).toLong())
         val data = JsonObject()
         data.addProperty("schedule", rmc)
