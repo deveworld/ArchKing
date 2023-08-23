@@ -4,7 +4,6 @@ import dev.worldsw.archKing.ArchKingPlugin
 import dev.worldsw.archKing.item.AKItem
 import io.papermc.paper.event.block.BlockBreakBlockEvent
 import org.bukkit.GameMode
-import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.EntityType
@@ -70,10 +69,11 @@ class AKBlockEvent(private val plugin: ArchKingPlugin) : Listener {
      */
     @EventHandler
     fun onEntityChangeBlockEvent(event: EntityChangeBlockEvent) {
-        if (event.block.type == Material.AIR) {
+        if (event.entityType != EntityType.FALLING_BLOCK) return
+        val dataAKItemType = plugin.akBlock.getCustomBlockData(event.block)
+        if (dataAKItemType == null) {
             plugin.akBlock.placeAKItem(event.entity.persistentDataContainer, event.block)
         } else {
-            val dataAKItemType = plugin.akBlock.getCustomBlockData(event.block) ?: return
             plugin.akBlock.removeCustomBlockData(event.block)
             event.entity.persistentDataContainer.set(
                 NamespacedKey(plugin, AKItem.CUSTOM_ITEM),

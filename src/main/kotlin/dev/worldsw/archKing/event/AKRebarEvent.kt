@@ -31,8 +31,9 @@ class AKRebarEvent(private val plugin: ArchKingPlugin) : Listener {
     @EventHandler
     fun onBlockPlaceEvent(event: BlockPlaceEvent) {
         if (event.block.type == Material.IRON_BARS) {
+            val success = plugin.akRebar.onPlaceRebar(event.block)
+            if (!success) return
             event.isCancelled = true
-            plugin.akRebar.onPlaceRebar(event.block)
             if (event.player.gameMode != GameMode.CREATIVE) event.player.inventory.removeItem(ItemStack(Material.IRON_BARS))
         }
     }

@@ -26,8 +26,8 @@ class AKRebar(private val plugin: ArchKingPlugin) {
         return Transformation(zeroVector3f, zeroAxisAngle4f, scale, zeroAxisAngle4f)
     }
 
-    fun onPlaceRebar(block: Block) {
-        if (plugin.storage.getData(AKStorage.REBARS, block.location.toBlockLocation().toString()) != null) return
+    fun onPlaceRebar(block: Block): Boolean {
+        if (plugin.storage.getData(AKStorage.REBARS, block.location.toBlockLocation().toString()) != null) return false
 
         val world = block.world
         val location = block.location
@@ -46,6 +46,7 @@ class AKRebar(private val plugin: ArchKingPlugin) {
         data.addProperty("rebarInteraction", rebarInteraction.uniqueId.toString())
 
         plugin.storage.addData(AKStorage.REBARS, location.toBlockLocation().toString(), data)
+        return true
     }
 
     fun onBreakRebar(entity: Entity) {
