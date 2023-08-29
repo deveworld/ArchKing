@@ -19,8 +19,8 @@ class AKRebarEvent(private val plugin: ArchKingPlugin) : Listener {
     @EventHandler
     fun onEntityDamageByEntityEvent(event: EntityDamageByEntityEvent) {
         if (event.damager !is Player) return
-        plugin.storage.getData(AKStorage.REBARS, event.entity.location.toBlockLocation().toString()) ?: return
 
+        plugin.storage.getData(AKStorage.REBARS, event.entity.location.toBlockLocation().toString()) ?: return
         plugin.akRebar.onBreakRebar(event.entity)
 
         val player = (event.damager as Player)
@@ -31,9 +31,9 @@ class AKRebarEvent(private val plugin: ArchKingPlugin) : Listener {
     @EventHandler
     fun onBlockPlaceEvent(event: BlockPlaceEvent) {
         if (event.block.type == Material.IRON_BARS) {
+            event.isCancelled = true
             val success = plugin.akRebar.onPlaceRebar(event.block)
             if (!success) return
-            event.isCancelled = true
             if (event.player.gameMode != GameMode.CREATIVE) event.player.inventory.removeItem(ItemStack(Material.IRON_BARS))
         }
     }

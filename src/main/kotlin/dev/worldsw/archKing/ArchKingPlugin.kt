@@ -40,7 +40,6 @@ class ArchKingPlugin: JavaPlugin(), Listener {
         val commandList = listOf("archkingitem")
         val getAkiCommands = listOf("archkingitem")
         commandList.forEach {
-            logger.info(it)
             getCommand(it)!!.setExecutor(AKCommand(this))
             if (it in getAkiCommands) {
                 getCommand(it)!!.tabCompleter = TabCompleter { _, _, label, args ->

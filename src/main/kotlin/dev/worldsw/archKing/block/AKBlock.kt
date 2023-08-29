@@ -78,13 +78,13 @@ class AKBlock(private val plugin: ArchKingPlugin) {
     }
 
     fun getCustomBlockData(block: Block): Int? {
-        if (!plugin.storage.getData(AKStorage.CUSTOM_ITEM).asJsonObject.has(block.location.toString())) return null
-        return plugin.storage.getData(AKStorage.CUSTOM_ITEM, block.location.toString())!!.asJsonObject!!.get("data").asInt
+        val data = plugin.storage.getData(AKStorage.CUSTOM_ITEM, block.location.toString()) ?: return null
+        return data.asJsonObject.get("data").asString.toIntOrNull()
     }
 
     private fun addCustomBlockData(block: Block, customBlock: Int) {
         val data = JsonObject()
-        data.addProperty("data", customBlock)
+        data.addProperty("data", customBlock.toString())
         plugin.storage.addData(AKStorage.CUSTOM_ITEM, block.location.toString(), data)
     }
 
