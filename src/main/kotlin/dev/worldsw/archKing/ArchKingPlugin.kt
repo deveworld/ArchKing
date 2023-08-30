@@ -56,6 +56,7 @@ class ArchKingPlugin: JavaPlugin(), Listener {
     }
 
     override fun onDisable() {
+        storage.saveData()
         Bukkit.getScheduler().cancelTasks(this)
     }
 }

@@ -16,6 +16,9 @@ class AKItem(private val plugin: ArchKingPlugin) {
     private var readyMixedConcrete: ItemStack; private var redCement: ItemStack
     private var gypsum: ItemStack; private var concrete: ItemStack
 
+    private var rebarPillar: ItemStack; private var rebarBeam: ItemStack
+    private var rebarSlab: ItemStack
+
     companion object {
         const val CUSTOM_ITEM           = "ArchKingItem"
         const val NOT_CUSTOM_ITEM       = 0
@@ -31,6 +34,10 @@ class AKItem(private val plugin: ArchKingPlugin) {
             AKItemType.RED_CEMENT ->               redCement.asQuantity(quantity)
             AKItemType.GYPSUM ->                   gypsum.asQuantity(quantity)
             AKItemType.CONCRETE ->                 concrete.asQuantity(quantity)
+
+            AKItemType.REBAR_PILLAR ->             rebarPillar.asQuantity(quantity)
+            AKItemType.REBAR_BEAM ->               rebarBeam.asQuantity(quantity)
+            AKItemType.REBAR_SLAB ->               rebarSlab.asQuantity(quantity)
             else ->                                ItemStack(Material.AIR)
         }
     }
@@ -126,6 +133,30 @@ class AKItem(private val plugin: ArchKingPlugin) {
             it.displayName(Component.text("콘크리트").decoration(TextDecoration.ITALIC, false))
             it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
                 AKItemType.CONCRETE
+            )
+        }
+
+        rebarPillar = ItemStack(Material.PURPLE_WOOL)
+        rebarPillar.editMeta {
+            it.displayName(Component.text("철근 기둥").decoration(TextDecoration.ITALIC, false))
+            it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
+                AKItemType.REBAR_PILLAR
+            )
+        }
+
+        rebarBeam = ItemStack(Material.MAGENTA_WOOL)
+        rebarBeam.editMeta {
+            it.displayName(Component.text("철근 보").decoration(TextDecoration.ITALIC, false))
+            it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
+                AKItemType.REBAR_BEAM
+            )
+        }
+
+        rebarSlab = ItemStack(Material.PINK_WOOL)
+        rebarSlab.editMeta {
+            it.displayName(Component.text("철근 슬래브").decoration(TextDecoration.ITALIC, false))
+            it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
+                AKItemType.REBAR_SLAB
             )
         }
     }

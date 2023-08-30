@@ -5,10 +5,13 @@ import dev.worldsw.archKing.ArchKingPlugin
 import dev.worldsw.archKing.data.AKStorage
 import dev.worldsw.archKing.item.AKItem
 import dev.worldsw.archKing.item.AKItemType
+import org.bukkit.GameMode
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataType
 
@@ -57,6 +60,7 @@ class AKBlock(private val plugin: ArchKingPlugin) {
             AKItem.NOT_CUSTOM_ITEM
         )
         if (dataAKItemType == AKItem.NOT_CUSTOM_ITEM) return
+        if (dataAKItemType in listOf(AKItemType.REBAR_BEAM, AKItemType.REBAR_PILLAR, AKItemType.REBAR_SLAB)) return
         plugin.akBlock.addCustomBlockData(block, dataAKItemType)
         if (dataAKItemType == AKItemType.READY_MIXED_CONCRETE) rmcToc(block)
     }

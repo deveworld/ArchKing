@@ -79,6 +79,30 @@ class AKRecipe(plugin: ArchKingPlugin) {
         ancientRecipe.addIngredient(Material.ROTTEN_FLESH)
         recipes.add(ancientRecipe)
 
+        val rebarPillarRecipe = ShapedRecipe(
+            NamespacedKey(plugin, "rebar_pillar_ak"),
+            plugin.akItem.getItem(AKItemType.REBAR_PILLAR, 4)
+        )
+        rebarPillarRecipe.shape("I I", "III", "I I")
+        rebarPillarRecipe.setIngredient('I', Material.IRON_INGOT)
+        recipes.add(rebarPillarRecipe)
+
+        val rebarBeamRecipe = ShapedRecipe(
+            NamespacedKey(plugin, "rebar_beam_ak"),
+            plugin.akItem.getItem(AKItemType.REBAR_BEAM, 4)
+        )
+        rebarBeamRecipe.shape("III", " I ", "III")
+        rebarBeamRecipe.setIngredient('I', Material.IRON_INGOT)
+        recipes.add(rebarBeamRecipe)
+
+        val rebarSlabRecipe = ShapedRecipe(
+            NamespacedKey(plugin, "rebar_slab_ak"),
+            plugin.akItem.getItem(AKItemType.REBAR_SLAB, 4)
+        )
+        rebarSlabRecipe.shape(" I ", "III", " I ")
+        rebarSlabRecipe.setIngredient('I', Material.IRON_INGOT)
+        recipes.add(rebarSlabRecipe)
+
         for (recipe in recipes) {
             Bukkit.addRecipe(recipe)
         }
