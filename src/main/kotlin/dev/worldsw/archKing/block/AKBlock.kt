@@ -5,13 +5,10 @@ import dev.worldsw.archKing.ArchKingPlugin
 import dev.worldsw.archKing.data.AKStorage
 import dev.worldsw.archKing.item.AKItem
 import dev.worldsw.archKing.item.AKItemType
-import org.bukkit.GameMode
 import org.bukkit.Location
-import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataType
 
@@ -60,7 +57,7 @@ class AKBlock(private val plugin: ArchKingPlugin) {
             AKItem.NOT_CUSTOM_ITEM
         )
         if (dataAKItemType == AKItem.NOT_CUSTOM_ITEM) return
-        if (dataAKItemType in listOf(AKItemType.REBAR_BEAM, AKItemType.REBAR_PILLAR, AKItemType.REBAR_SLAB)) return
+        if (dataAKItemType in AKOverlapBlock.OVERLAP_BLOCKS) return
         plugin.akBlock.addCustomBlockData(block, dataAKItemType)
         if (dataAKItemType == AKItemType.READY_MIXED_CONCRETE) rmcToc(block)
     }
@@ -82,17 +79,17 @@ class AKBlock(private val plugin: ArchKingPlugin) {
     }
 
     fun getCustomBlockData(block: Block): Int? {
-        val data = plugin.storage.getData(AKStorage.CUSTOM_ITEM, block.location.toString()) ?: return null
+        val data = plugin.storage.getData(AKStorage.ARCHKING_BLOCK, block.location.toString()) ?: return null
         return data.asJsonObject.get("data").asString.toIntOrNull()
     }
 
     private fun addCustomBlockData(block: Block, customBlock: Int) {
         val data = JsonObject()
         data.addProperty("data", customBlock.toString())
-        plugin.storage.addData(AKStorage.CUSTOM_ITEM, block.location.toString(), data)
+        plugin.storage.addData(AKStorage.ARCHKING_BLOCK, block.location.toString(), data)
     }
 
     fun removeCustomBlockData(block: Block) {
-        plugin.storage.removeData(AKStorage.CUSTOM_ITEM, block.location.toString())
+        plugin.storage.removeData(AKStorage.ARCHKING_BLOCK, block.location.toString())
     }
 }

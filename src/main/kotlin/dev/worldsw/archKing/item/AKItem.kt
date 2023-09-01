@@ -19,6 +19,8 @@ class AKItem(private val plugin: ArchKingPlugin) {
     private var rebarPillar: ItemStack; private var rebarBeam: ItemStack
     private var rebarSlab: ItemStack
 
+    private var pipe: ItemStack
+
     companion object {
         const val CUSTOM_ITEM           = "ArchKingItem"
         const val NOT_CUSTOM_ITEM       = 0
@@ -38,6 +40,8 @@ class AKItem(private val plugin: ArchKingPlugin) {
             AKItemType.REBAR_PILLAR ->             rebarPillar.asQuantity(quantity)
             AKItemType.REBAR_BEAM ->               rebarBeam.asQuantity(quantity)
             AKItemType.REBAR_SLAB ->               rebarSlab.asQuantity(quantity)
+
+            AKItemType.PIPE ->                     pipe.asQuantity(quantity)
             else ->                                ItemStack(Material.AIR)
         }
     }
@@ -136,7 +140,7 @@ class AKItem(private val plugin: ArchKingPlugin) {
             )
         }
 
-        rebarPillar = ItemStack(Material.PURPLE_WOOL)
+        rebarPillar = ItemStack(Material.RED_NETHER_BRICK_WALL)
         rebarPillar.editMeta {
             it.displayName(Component.text("철근 기둥").decoration(TextDecoration.ITALIC, false))
             it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
@@ -144,7 +148,7 @@ class AKItem(private val plugin: ArchKingPlugin) {
             )
         }
 
-        rebarBeam = ItemStack(Material.MAGENTA_WOOL)
+        rebarBeam = ItemStack(Material.RED_NETHER_BRICK_WALL)
         rebarBeam.editMeta {
             it.displayName(Component.text("철근 보").decoration(TextDecoration.ITALIC, false))
             it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
@@ -152,11 +156,19 @@ class AKItem(private val plugin: ArchKingPlugin) {
             )
         }
 
-        rebarSlab = ItemStack(Material.PINK_WOOL)
+        rebarSlab = ItemStack(Material.MAGENTA_CANDLE)
         rebarSlab.editMeta {
             it.displayName(Component.text("철근 슬래브").decoration(TextDecoration.ITALIC, false))
             it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
                 AKItemType.REBAR_SLAB
+            )
+        }
+
+        pipe = ItemStack(Material.BAMBOO_FENCE)
+        pipe.editMeta {
+            it.displayName(Component.text("파이프").decoration(TextDecoration.ITALIC, false))
+            it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
+                AKItemType.PIPE
             )
         }
     }

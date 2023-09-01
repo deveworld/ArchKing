@@ -14,5 +14,6 @@ class AKItemType {
         const val REBAR_PILLAR          = 101
         const val REBAR_BEAM            = 102
         const val REBAR_SLAB            = 103
+        const val PIPE                  = 104
     }
 }
