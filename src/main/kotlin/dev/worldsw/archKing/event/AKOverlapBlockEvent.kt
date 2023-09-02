@@ -6,6 +6,7 @@ import dev.worldsw.archKing.data.AKStorage
 import dev.worldsw.archKing.item.AKItem
 import dev.worldsw.archKing.item.AKItemType
 import org.bukkit.GameMode
+import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Sound
 import org.bukkit.block.data.type.Candle
@@ -17,7 +18,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.player.PlayerInteractEntityEvent
+import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.persistence.PersistentDataType
 import java.util.*
 
@@ -75,15 +76,29 @@ class AKOverlapBlockEvent(private val plugin: ArchKingPlugin) : Listener {
     }
 
     @EventHandler
-    fun onPlayerInteractEntityEvent(event: PlayerInteractEntityEvent) {
+    fun onPlayerInteractAtEntityEvent(event: PlayerInteractAtEntityEvent) {
         if (event.rightClicked.type != EntityType.INTERACTION) return
+
+        var location = event.rightClicked.location
+        if (event.player.isSneaking) {
+            val face = event.rightClicked.boundingBox.rayTrace(
+                event.player.eyeLocation.toVector(),
+                event.player.location.direction,
+                10.0
+            )?.hitBlockFace ?: return
+            location = location.block.getRelative(face).location
+        }
+        if (location.block.type != Material.AIR) return
 
         val mainHandItem = event.player.inventory.itemInMainHand
         val offHandItem = event.player.inventory.itemInOffHand
-        val location = event.rightClicked.location.toBlockLocation()
 
-        if (!plugin.akOverlapBlock.placeBlockOnBlock(event.player, mainHandItem, location)) {
-            plugin.akOverlapBlock.placeBlockOnBlock(event.player, offHandItem, location)
+        if (!plugin.akOverlapBlock.placeBlockOnBlock(mainHandItem, location.toBlockLocation())) {
+            if (plugin.akOverlapBlock.placeBlockOnBlock(offHandItem, location.toBlockLocation())) {
+                if (event.player.gameMode != GameMode.CREATIVE) event.player.inventory.removeItemAnySlot(offHandItem.asQuantity(1))
+            }
+        } else {
+            if (event.player.gameMode != GameMode.CREATIVE) event.player.inventory.removeItemAnySlot(mainHandItem.asQuantity(1))
         }
     }
 }

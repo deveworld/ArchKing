@@ -6,7 +6,6 @@ import dev.worldsw.archKing.ArchKingPlugin
 import dev.worldsw.archKing.data.AKStorage
 import dev.worldsw.archKing.item.AKItem
 import dev.worldsw.archKing.item.AKItemType
-import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.Sound
@@ -18,7 +17,6 @@ import org.bukkit.block.data.type.Wall
 import org.bukkit.entity.BlockDisplay
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Interaction
-import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.util.Transformation
@@ -95,7 +93,7 @@ class AKOverlapBlock(private val plugin: ArchKingPlugin) {
         blockData.isUp = isUpWall(blockData)
     }
 
-    fun placeBlockOnBlock(player: Player, item: ItemStack, location: Location): Boolean {
+    fun placeBlockOnBlock(item: ItemStack, location: Location): Boolean {
         if (item.itemMeta == null) return false
         val itemData = item.itemMeta.persistentDataContainer.getOrDefault(
             NamespacedKey(plugin, AKItem.CUSTOM_ITEM),
@@ -104,39 +102,33 @@ class AKOverlapBlock(private val plugin: ArchKingPlugin) {
         )
 
         if (itemData == AKItem.NOT_CUSTOM_ITEM) {
-            player.world.getBlockAt(location).type = item.type
-            player.world.playSound(location, Sound.BLOCK_STONE_PLACE, 1f, 1f)
-            if (player.gameMode != GameMode.CREATIVE) player.inventory.removeItemAnySlot(item.asQuantity(1))
+            location.world.getBlockAt(location).type = item.type
+            location.world.playSound(location, Sound.BLOCK_STONE_PLACE, 1f, 1f)
             return true
         }
 
-        if (itemData in listOf(AKItemType.REBAR_BEAM, AKItemType.REBAR_PILLAR)
-            && plugin.storage.getData(AKStorage.REBARS, location.toBlockLocation().toString()) != null) return false
-        if (itemData == AKItemType.REBAR_SLAB) {
-            return if (plugin.akOverlapBlock.updateRebarSlab(location)) {
-                if (player.gameMode != GameMode.CREATIVE) player.inventory.removeItemAnySlot(
-                    item.asQuantity(
-                        1
-                    )
-                )
-                true
-            } else {
-                false
+        if (plugin.storage.getData(AKStorage.REBARS, location.toBlockLocation().toString()) != null) {
+            if (itemData in listOf(AKItemType.REBAR_BEAM, AKItemType.REBAR_PILLAR)) return false
+            if (itemData == AKItemType.REBAR_SLAB) {
+                return plugin.akOverlapBlock.updateRebarSlab(location)
             }
+        }
+
+        if (plugin.storage.getData(AKStorage.PIPES, location.toBlockLocation().toString()) != null) {
+            if (itemData in PIPES) return false
+        }
+
+        if (itemData in REBARS) {
+            return onRebarPlace(location.block, itemData)
         }
 
         if (itemData in PIPES) {
-            return if (onPipePlace(location.block, itemData)) {
-                if (player.gameMode != GameMode.CREATIVE) player.inventory.removeItemAnySlot(item.asQuantity(1))
-                true
-            } else {
-                false
-            }
+            return onPipePlace(location.block, itemData)
         }
 
-        player.world.getBlockAt(location).type = item.type
-        player.world.playSound(location, Sound.BLOCK_STONE_PLACE, 1f, 1f)
-        plugin.akBlock.placeAKItem(item.itemMeta.persistentDataContainer, player.world.getBlockAt(location))
+        location.world.getBlockAt(location).type = item.type
+        location.world.playSound(location, Sound.BLOCK_STONE_PLACE, 1f, 1f)
+        plugin.akBlock.placeAKItem(item.itemMeta.persistentDataContainer, location.world.getBlockAt(location))
         return true
     }
 
@@ -160,8 +152,8 @@ class AKOverlapBlock(private val plugin: ArchKingPlugin) {
         }
 
         val rebarInteraction = world.spawn(location.clone().add(0.5, 0.0, 0.5), Interaction::class.java) { interact ->
-            interact.interactionWidth = 0.9f
-            interact.interactionHeight = if (rebarData == AKItemType.REBAR_SLAB) 0.2f else 0.9f
+            interact.interactionWidth = 0.95f
+            interact.interactionHeight = if (rebarData == AKItemType.REBAR_SLAB) 0.2f else 0.95f
         }
 
         val data = JsonObject()
