@@ -23,7 +23,7 @@
 ## 사용 방법
 서버 plugins 폴더에 플러그인을 넣어주시면 됩니다!
 
-그리고 이 리소스팩들을 사용해주세요! [#1](https://download.blog.naver.com/open/4edb52e2f7a3aa765ab5d9e9d3354b3d9cc63ad8ec/43GnCxcF3g5gH7NwpY7cECrYHNqRuJx9nLxNI5TM26rEzYDLEPl6LJghMe0y2C3rZOI90mAd3wVxKAdyKb4y9w/architecture_king_02_sukgo.zip)([credits](https://blog.naver.com/architecture_king/223205380529)
+그리고 이 리소스팩들을 사용해주세요! [#1](https://download.blog.naver.com/open/4edb52e2f7a3aa765ab5d9e9d3354b3d9cc63ad8ec/43GnCxcF3g5gH7NwpY7cECrYHNqRuJx9nLxNI5TM26rEzYDLEPl6LJghMe0y2C3rZOI90mAd3wVxKAdyKb4y9w/architecture_king_02_sukgo.zip)([credits](https://blog.naver.com/architecture_king/223205380529))
 
 정말 간단하죠?
 
