@@ -23,6 +23,8 @@ The results are stored in `build/libs/`.
 ## How to use
 Just put the plug-in in the server plugins folder!
 
+And use these resource packs! [#1](https://download.blog.naver.com/open/4edb52e2f7a3aa765ab5d9e9d3354b3d9cc63ad8ec/43GnCxcF3g5gH7NwpY7cECrYHNqRuJx9nLxNI5TM26rEzYDLEPl6LJghMe0y2C3rZOI90mAd3wVxKAdyKb4y9w/architecture_king_02_sukgo.zip)([credits](https://blog.naver.com/architecture_king/223205380529)
+
 What a simple!
 
 ### Caution for server
