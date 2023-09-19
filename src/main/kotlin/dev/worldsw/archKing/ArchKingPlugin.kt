@@ -33,22 +33,36 @@ class ArchKingPlugin: JavaPlugin(), Listener {
         server.pluginManager.registerEvents(AKGypsumEvent(this), this)
         server.pluginManager.registerEvents(AKBlockEvent(this), this)
         server.pluginManager.registerEvents(AKFallEvent(this), this)
+        server.pluginManager.registerEvents(AKPaintEvent(this), this)
 
         val voidTabCompleter = TabCompleter { _, _, _, _ -> mutableListOf() }
-        val commandList = listOf("archkingitem")
-        val getAkiCommands = listOf("archkingitem")
+        val commandList = listOf("akitem", "akgravity")
         commandList.forEach {
             getCommand(it)!!.setExecutor(AKCommand(this))
-            if (it in getAkiCommands) {
-                getCommand(it)!!.tabCompleter = TabCompleter { _, _, label, args ->
-                    if (label.equals(it, true) && args.size == 1) {
-                        akItem.getAllProperties()
-                    } else {
-                        mutableListOf()
+            when (it) {
+                "akitem" -> {
+                    getCommand(it)!!.tabCompleter = TabCompleter { _, _, label, args ->
+                        if (label.equals(it, true) && args.size == 1) {
+                            akItem.getAllProperties()
+                        } else {
+                            mutableListOf()
+                        }
                     }
                 }
-            } else {
-                getCommand(it)!!.tabCompleter = voidTabCompleter
+
+                "akgravity" -> {
+                    getCommand(it)!!.tabCompleter = TabCompleter { _, _, label, args ->
+                        if (label.equals(it, true) && args.size == 1) {
+                            mutableListOf("concrete", "wood")
+                        } else {
+                            mutableListOf()
+                        }
+                    }
+                }
+
+                else -> {
+                    getCommand(it)!!.tabCompleter = voidTabCompleter
+                }
             }
         }
     }

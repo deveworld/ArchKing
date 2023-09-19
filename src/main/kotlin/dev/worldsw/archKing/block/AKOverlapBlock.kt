@@ -2,7 +2,6 @@ package dev.worldsw.archKing.block
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import com.sun.jna.platform.win32.WinBase.SYSTEM_INFO.PI
 import dev.worldsw.archKing.ArchKingPlugin
 import dev.worldsw.archKing.data.AKStorage
 import dev.worldsw.archKing.item.AKItem
@@ -112,6 +111,7 @@ class AKOverlapBlock(private val plugin: ArchKingPlugin) {
         )
 
         if (itemData == AKItem.NOT_CUSTOM_ITEM) { // Place NOT custom data => allow
+            if (!item.type.isBlock) return false
             location.world.getBlockAt(location).type = item.type
             location.world.playSound(location, Sound.BLOCK_STONE_PLACE, 1f, 1f)
             return true
@@ -195,7 +195,7 @@ class AKOverlapBlock(private val plugin: ArchKingPlugin) {
         data.addProperty("model", rebar.uniqueId.toString())
         data.addProperty("interaction", rebarInteraction.uniqueId.toString())
 
-        plugin.storage.addData(AKStorage.REBARS, location.toBlockLocation().toString(), data)
+        plugin.storage.setData(AKStorage.REBARS, location.toBlockLocation().toString(), data)
         return true
     }
 
@@ -217,7 +217,7 @@ class AKOverlapBlock(private val plugin: ArchKingPlugin) {
         data.addProperty("model", pipe.uniqueId.toString())
         data.addProperty("interaction", pipeInteraction.uniqueId.toString())
 
-        plugin.storage.addData(AKStorage.PIPES, location.toBlockLocation().toString(), data)
+        plugin.storage.setData(AKStorage.PIPES, location.toBlockLocation().toString(), data)
         return true
     }
 
@@ -239,7 +239,7 @@ class AKOverlapBlock(private val plugin: ArchKingPlugin) {
         data.addProperty("model", frame.uniqueId.toString())
         data.addProperty("interaction", pipeInteraction.uniqueId.toString())
 
-        plugin.storage.addData(AKStorage.STEEL_FRAMES, location.toBlockLocation().toString(), data)
+        plugin.storage.setData(AKStorage.STEEL_FRAMES, location.toBlockLocation().toString(), data)
         return true
     }
 

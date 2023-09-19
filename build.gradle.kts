@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "dev.worldsw"
-version = "2.0.0-RC3"
+version = "2.0.0-RC4"
 description = "The plugin for the architecture king(YouTuber)."
 
 repositories {

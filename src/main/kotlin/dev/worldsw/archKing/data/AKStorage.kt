@@ -9,7 +9,6 @@ import dev.worldsw.archKing.ArchKingPlugin
 import java.io.File
 import java.io.FileOutputStream
 import java.nio.charset.Charset
-import kotlin.math.PI
 
 
 class AKStorage(private val plugin: ArchKingPlugin) {
@@ -18,10 +17,16 @@ class AKStorage(private val plugin: ArchKingPlugin) {
 
     private lateinit var overlapBlockData: HashMap<String, HashMap<String, HashMap<String, String>>>
     private lateinit var blockData: HashMap<String, HashMap<String, String>>
+    private lateinit var gravityData: HashMap<String, Boolean>
 
     companion object {
         @Deprecated("An old key", ReplaceWith("ARCHKING_BLOCK"))
         const val CUSTOM_ITEM = "custom_item"
+
+        const val GRAVITY = "gravity"
+        const val WOOD_GRAVITY = "gravity_wood"
+        const val CONCRETE_GRAVITY = "gravity_concrete"
+        val GRAVITY_TYPES = listOf(WOOD_GRAVITY, CONCRETE_GRAVITY)
 
         const val ARCHKING_BLOCK = "archking_block"
         const val OVERLAP_ARCHKING_BLOCK = "overlap_archking_block"
@@ -52,6 +57,8 @@ class AKStorage(private val plugin: ArchKingPlugin) {
 
         if (!data.has(ARCHKING_BLOCK)) data.add(ARCHKING_BLOCK, JsonObject())
         if (!data.has(OVERLAP_ARCHKING_BLOCK)) data.add(OVERLAP_ARCHKING_BLOCK, JsonObject())
+        if (!data.has(GRAVITY)) data.add(GRAVITY, JsonObject())
+
         if (!memory.has(READY_MIXED_CONCRETE_HARD)) memory.add(READY_MIXED_CONCRETE_HARD, JsonObject())
 
         if (data.has(CUSTOM_ITEM)) {
@@ -65,10 +72,16 @@ class AKStorage(private val plugin: ArchKingPlugin) {
                 .asJsonObject.add(block, JsonObject())
         }
 
+        for (gravity in GRAVITY_TYPES) {
+            if (!data.get(GRAVITY).asJsonObject.has(gravity)) data.get(GRAVITY)
+                .asJsonObject.addProperty(gravity, false)
+        }
+
         overlapBlockData = Gson().fromJson(
             data.get(OVERLAP_ARCHKING_BLOCK),
             object : TypeToken<HashMap<String, HashMap<String, HashMap<String, String>>>>() {}.type)
         blockData = Gson().fromJson(data.get(ARCHKING_BLOCK), object : TypeToken<HashMap<String, HashMap<String, String>>>() {}.type)
+        gravityData = Gson().fromJson(data.get(GRAVITY), object : TypeToken<HashMap<String, Boolean>>() {}.type)
     }
 
     fun saveData() {
@@ -77,8 +90,10 @@ class AKStorage(private val plugin: ArchKingPlugin) {
 
         data.asJsonObject.remove(OVERLAP_ARCHKING_BLOCK)
         data.asJsonObject.remove(ARCHKING_BLOCK)
+        data.asJsonObject.remove(GRAVITY)
         data.add(OVERLAP_ARCHKING_BLOCK, Gson().toJsonTree(overlapBlockData))
         data.add(ARCHKING_BLOCK, Gson().toJsonTree(blockData))
+        data.add(GRAVITY, Gson().toJsonTree(gravityData))
 
         dataFile.outputStream().use { fileOutputStream ->
             fileOutputStream.write(data.toString().toByteArray(Charset.forName("UTF-8")))
@@ -108,13 +123,21 @@ class AKStorage(private val plugin: ArchKingPlugin) {
     /**
      * Data
      */
-    fun addData(property: String, inputProperty: String, value: JsonElement) {
+    fun setData(property: String, inputProperty: String, value: JsonElement) {
         when (property) {
             in OVERLAP_ARCHKING_BLOCKS -> overlapBlockData[property]!![inputProperty] =
                 Gson().fromJson(value, object : TypeToken<HashMap<String, Any?>?>() {}.type)
             ARCHKING_BLOCK -> blockData[inputProperty] =
-                    Gson().fromJson(value, object : TypeToken<HashMap<String, Any?>?>() {}.type)
+                Gson().fromJson(value, object : TypeToken<HashMap<String, Any?>?>() {}.type)
+            GRAVITY -> gravityData[inputProperty] =
+                Gson().fromJson(value, object : TypeToken<HashMap<String, Any?>?>() {}.type)
             else -> getData(property).asJsonObject.add(inputProperty, value)
+        }
+    }
+
+    fun setData(property: String, inputProperty: String, value: Boolean) {
+        when (property) {
+            GRAVITY -> gravityData[inputProperty] = value
         }
     }
 
@@ -132,6 +155,10 @@ class AKStorage(private val plugin: ArchKingPlugin) {
                 val data = blockData[secondProperty] ?: return null
                 Gson().toJsonTree(data)
             }
+            GRAVITY -> {
+                val data = gravityData[secondProperty] ?: return null
+                Gson().toJsonTree(data)
+            }
             else -> data.get(property).asJsonObject?.get(secondProperty)
         }
     }
@@ -140,6 +167,7 @@ class AKStorage(private val plugin: ArchKingPlugin) {
         when (property) {
             in OVERLAP_ARCHKING_BLOCKS -> overlapBlockData[property]!!.remove(removeProperty)
             ARCHKING_BLOCK -> blockData.remove(removeProperty)
+            GRAVITY -> gravityData.remove(removeProperty)
             else -> getData(property).asJsonObject.remove(removeProperty)
         }
     }
