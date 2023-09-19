@@ -2,6 +2,7 @@ package dev.worldsw.archKing.block
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import com.sun.jna.platform.win32.WinBase.SYSTEM_INFO.PI
 import dev.worldsw.archKing.ArchKingPlugin
 import dev.worldsw.archKing.data.AKStorage
 import dev.worldsw.archKing.item.AKItem
@@ -26,10 +27,18 @@ import java.util.*
 
 class AKOverlapBlock(private val plugin: ArchKingPlugin) {
     companion object {
-        val OVERLAP_BLOCKS = listOf(AKItemType.PIPE, AKItemType.REBAR_PILLAR, AKItemType.REBAR_BEAM, AKItemType.REBAR_SLAB)
+        val OVERLAP_BLOCKS = listOf(
+            AKItemType.PIPE,
+            AKItemType.REBAR_PILLAR,
+            AKItemType.REBAR_BEAM,
+            AKItemType.REBAR_SLAB,
+            AKItemType.STEEL_FRAME,
+            AKItemType.DECK_PLATE
+        )
 
         val PIPES = listOf(AKItemType.PIPE)
         val REBARS = listOf(AKItemType.REBAR_PILLAR, AKItemType.REBAR_BEAM, AKItemType.REBAR_SLAB)
+        val STEEL_FRAMES = listOf(AKItemType.STEEL_FRAME, AKItemType.DECK_PLATE)
     }
 
     private fun promiseBlock(blockDisplay: BlockDisplay, transformation: Transformation) {
@@ -65,7 +74,7 @@ class AKOverlapBlock(private val plugin: ArchKingPlugin) {
         val alreadyData = plugin.storage.getData(AKStorage.REBARS, location.toBlockLocation().toString())
         if (alreadyData == null || alreadyData.asJsonObject.get("data").asString.toIntOrNull() != AKItemType.REBAR_SLAB) return false
         val slab =
-            location.world.getEntity(UUID.fromString(alreadyData.asJsonObject.get("rebar").asString))!! as BlockDisplay
+            location.world.getEntity(UUID.fromString(alreadyData.asJsonObject.get("model").asString))!! as BlockDisplay
         if (slab.block as? Candle == null) return false
         val slabData = slab.block as Candle
         if (slabData.maximumCandles == slabData.candles) return false
@@ -74,23 +83,24 @@ class AKOverlapBlock(private val plugin: ArchKingPlugin) {
         return true
     }
 
-    private fun updateRebarWall(block: Block, blockData: BlockData, height: Wall.Height) {
-        if (blockData as? Wall == null) return
+    private fun updateWall(block: Block, blockData: BlockData, storage: String, height: Wall.Height): BlockData {
+        if (blockData as? Wall == null) return blockData
         for (face in listOf(BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST)) {
-            val otherRebarData = plugin.storage.getData(
-                AKStorage.REBARS,
+            val otherWallData = plugin.storage.getData(
+                storage,
                 block.getRelative(face).location.toBlockLocation().toString()
             ) ?: continue
-            val otherRebar =
-                block.world.getEntity(UUID.fromString(otherRebarData.asJsonObject.get("rebar").asString))!! as BlockDisplay
-            if (otherRebar.block as? Wall == null) continue
+            val otherWall =
+                block.world.getEntity(UUID.fromString(otherWallData.asJsonObject.get("model").asString))!! as BlockDisplay
+            if (otherWall.block as? Wall == null) continue
             blockData.setHeight(face, height)
-            val otherRebarBlockData = otherRebar.block as Wall
-            otherRebarBlockData.setHeight(face.oppositeFace, height)
-            otherRebarBlockData.isUp = isUpWall(otherRebarBlockData)
-            otherRebar.block = otherRebarBlockData
+            val otherWallBlockData = otherWall.block as Wall
+            otherWallBlockData.setHeight(face.oppositeFace, height)
+            otherWallBlockData.isUp = isUpWall(otherWallBlockData)
+            otherWall.block = otherWallBlockData
         }
         blockData.isUp = isUpWall(blockData)
+        return blockData
     }
 
     fun placeBlockOnBlock(item: ItemStack, location: Location): Boolean {
@@ -101,29 +111,37 @@ class AKOverlapBlock(private val plugin: ArchKingPlugin) {
             AKItem.NOT_CUSTOM_ITEM
         )
 
-        if (itemData == AKItem.NOT_CUSTOM_ITEM) {
+        if (itemData == AKItem.NOT_CUSTOM_ITEM) { // Place NOT custom data => allow
             location.world.getBlockAt(location).type = item.type
             location.world.playSound(location, Sound.BLOCK_STONE_PLACE, 1f, 1f)
             return true
         }
 
-        if (plugin.storage.getData(AKStorage.REBARS, location.toBlockLocation().toString()) != null) {
-            if (itemData in listOf(AKItemType.REBAR_BEAM, AKItemType.REBAR_PILLAR)) return false
-            if (itemData == AKItemType.REBAR_SLAB) {
-                return plugin.akOverlapBlock.updateRebarSlab(location)
-            }
-        }
-
-        if (plugin.storage.getData(AKStorage.PIPES, location.toBlockLocation().toString()) != null) {
-            if (itemData in PIPES) return false
-        }
-
+        // rebar place
         if (itemData in REBARS) {
+            val rebarData = plugin.storage.getData(AKStorage.REBARS, location.toBlockLocation().toString())
+            if (rebarData != null) {
+                val rebarItemData = rebarData.asJsonObject.get("data").asString.toIntOrNull()
+                // Update rebar slab
+                if (itemData == AKItemType.REBAR_SLAB && rebarItemData == AKItemType.REBAR_SLAB)
+                    return plugin.akOverlapBlock.updateRebarSlab(location)
+                return false
+            }
             return onRebarPlace(location.block, itemData)
         }
 
+        // pipe place
         if (itemData in PIPES) {
+            if (plugin.storage.getData(AKStorage.PIPES, location.toBlockLocation().toString()) != null) return false
+
             return onPipePlace(location.block, itemData)
+        }
+
+        // steel frame place
+        if (itemData in STEEL_FRAMES) {
+            if (plugin.storage.getData(AKStorage.STEEL_FRAMES, location.toBlockLocation().toString()) != null) return false
+
+            return onFramePlace(location.block, itemData)
         }
 
         location.world.getBlockAt(location).type = item.type
@@ -132,24 +150,40 @@ class AKOverlapBlock(private val plugin: ArchKingPlugin) {
         return true
     }
 
+    private fun spawnBlockDisplay(block: Block, itemData: Int): BlockDisplay {
+        val world = block.world
+        val location = block.location
+        val entity = world.spawn(location, BlockDisplay::class.java) { blockEntity ->
+            val blockData = plugin.akItem.getItem(itemData).type.createBlockData()
+            blockEntity.block = blockData
+            blockEntity.persistentDataContainer.set(
+                NamespacedKey(plugin, AKItem.CUSTOM_ITEM),
+                PersistentDataType.INTEGER,
+                itemData
+            )
+            promiseBlock(blockEntity, getTransformation(Vector3f(0.99f, 0.98f, 0.99f)))
+        }
+        return entity
+    }
+
     fun onRebarPlace(block: Block, rebarData: Int): Boolean {
-        val alreadyData = plugin.storage.getData(AKStorage.REBARS, block.location.toBlockLocation().toString())
-        if (alreadyData != null) return false
         if (rebarData !in REBARS) return false
 
         val world = block.world
         val location = block.location
-        val rebar = world.spawn(location, BlockDisplay::class.java) { rebarBlock ->
-            val blockData = plugin.akItem.getItem(rebarData).type.createBlockData()
-            updateRebarWall(block, blockData, Wall.Height.LOW)
-            rebarBlock.block = blockData
-            rebarBlock.persistentDataContainer.set(
-                NamespacedKey(plugin, AKItem.CUSTOM_ITEM),
-                PersistentDataType.INTEGER,
-                rebarData
-            )
-            promiseBlock(rebarBlock, getTransformation(Vector3f(1f, 1f, 1f)))
-        }
+        val rebar = spawnBlockDisplay(block, rebarData)
+//        val rebar = world.spawn(location, BlockDisplay::class.java) { blockEntity ->
+//            val blockData = plugin.akItem.getItem(rebarData).type.createBlockData()
+//            updateRebarWall(block, blockData, Wall.Height.LOW)
+//            blockEntity.block = blockData
+//            blockEntity.persistentDataContainer.set(
+//                NamespacedKey(plugin, AKItem.CUSTOM_ITEM),
+//                PersistentDataType.INTEGER,
+//                rebarData
+//            )
+//            promiseBlock(blockEntity, getTransformation(Vector3f(1f, 1f, 1f)))
+//        }
+        rebar.block = updateWall(block, rebar.block, AKStorage.REBARS, Wall.Height.LOW)
 
         val rebarInteraction = world.spawn(location.clone().add(0.5, 0.0, 0.5), Interaction::class.java) { interact ->
             interact.interactionWidth = 0.95f
@@ -158,30 +192,20 @@ class AKOverlapBlock(private val plugin: ArchKingPlugin) {
 
         val data = JsonObject()
         data.addProperty("data", rebarData.toString())
-        data.addProperty("rebar", rebar.uniqueId.toString())
-        data.addProperty("rebarInteraction", rebarInteraction.uniqueId.toString())
+        data.addProperty("model", rebar.uniqueId.toString())
+        data.addProperty("interaction", rebarInteraction.uniqueId.toString())
 
         plugin.storage.addData(AKStorage.REBARS, location.toBlockLocation().toString(), data)
         return true
     }
 
     fun onPipePlace(block: Block, pipeData: Int): Boolean {
-        val alreadyData = plugin.storage.getData(AKStorage.PIPES, block.location.toBlockLocation().toString())
-        if (alreadyData != null) return false
         if (pipeData !in PIPES) return false
 
         val world = block.world
         val location = block.location
-        val pipe = world.spawn(location, BlockDisplay::class.java) { pipeBlock ->
-            val blockData = plugin.akItem.getItem(pipeData).type.createBlockData()
-            pipeBlock.block = blockData
-            pipeBlock.persistentDataContainer.set(
-                NamespacedKey(plugin, AKItem.CUSTOM_ITEM),
-                PersistentDataType.INTEGER,
-                pipeData
-            )
-            promiseBlock(pipeBlock, getTransformation(Vector3f(1f, 1f, 1f)))
-        }
+        val pipe = spawnBlockDisplay(block, pipeData)
+        pipe.block = updateWall(block, pipe.block, AKStorage.PIPES, Wall.Height.LOW)
 
         val pipeInteraction = world.spawn(location.clone().add(0.5, 0.0, 0.5), Interaction::class.java) { interact ->
             interact.interactionWidth = 0.3f
@@ -190,10 +214,32 @@ class AKOverlapBlock(private val plugin: ArchKingPlugin) {
 
         val data = JsonObject()
         data.addProperty("data", pipeData.toString())
-        data.addProperty("pipe", pipe.uniqueId.toString())
-        data.addProperty("pipeInteraction", pipeInteraction.uniqueId.toString())
+        data.addProperty("model", pipe.uniqueId.toString())
+        data.addProperty("interaction", pipeInteraction.uniqueId.toString())
 
         plugin.storage.addData(AKStorage.PIPES, location.toBlockLocation().toString(), data)
+        return true
+    }
+
+    fun onFramePlace(block: Block, frameData: Int): Boolean {
+        if (frameData !in STEEL_FRAMES) return false
+
+        val world = block.world
+        val location = block.location
+        val frame = spawnBlockDisplay(block, frameData)
+        frame.block = updateWall(block, frame.block, AKStorage.STEEL_FRAMES, Wall.Height.LOW)
+
+        val pipeInteraction = world.spawn(location.clone().add(0.5, 0.0, 0.5), Interaction::class.java) { interact ->
+            interact.interactionWidth = 0.5f
+            interact.interactionHeight = 1f
+        }
+
+        val data = JsonObject()
+        data.addProperty("data", frameData.toString())
+        data.addProperty("model", frame.uniqueId.toString())
+        data.addProperty("interaction", pipeInteraction.uniqueId.toString())
+
+        plugin.storage.addData(AKStorage.STEEL_FRAMES, location.toBlockLocation().toString(), data)
         return true
     }
 
@@ -204,18 +250,23 @@ class AKOverlapBlock(private val plugin: ArchKingPlugin) {
         for ((key, value) in data.asJsonObject.entrySet()) {
             if (key == "data") continue
             val uuid = value.asString
-            val model = entity.world.getEntity(UUID.fromString(uuid))!!
-            if (akItemData in REBARS && model as? BlockDisplay != null) {
-                val block = entity.world.getBlockAt(entity.location)
-                updateRebarWall(block, model.block, Wall.Height.NONE)
+            val model = entity.world.getEntity(UUID.fromString(uuid))
+            val block = entity.world.getBlockAt(entity.location)
+            if (model as? BlockDisplay != null) {
+                when (akItemData) {
+                    in REBARS -> updateWall(block, model.block, AKStorage.REBARS, Wall.Height.NONE)
+                    in STEEL_FRAMES -> updateWall(block, model.block, AKStorage.STEEL_FRAMES, Wall.Height.NONE)
+                    in PIPES -> updateWall(block, model.block, AKStorage.PIPES, Wall.Height.NONE)
+                }
             }
-            model.remove()
+            model?.remove()
         }
 
-        val type: String = if (akItemData in REBARS) {
-            AKStorage.REBARS
-        } else {
-            if (akItemData in PIPES) AKStorage.PIPES else ""
+        val type: String = when (akItemData) {
+            in REBARS -> AKStorage.REBARS
+            in PIPES -> AKStorage.PIPES
+            in STEEL_FRAMES -> AKStorage.STEEL_FRAMES
+            else -> ""
         }
         plugin.storage.removeData(type, location)
     }

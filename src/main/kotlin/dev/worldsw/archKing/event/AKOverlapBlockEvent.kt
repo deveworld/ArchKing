@@ -35,10 +35,47 @@ class AKOverlapBlockEvent(private val plugin: ArchKingPlugin) : Listener {
         if (data !in AKOverlapBlock.OVERLAP_BLOCKS) return
 
         event.isCancelled = true
-        val success = if (data in AKOverlapBlock.REBARS) {
-            plugin.akOverlapBlock.onRebarPlace(event.block, data)
-        } else {
-            plugin.akOverlapBlock.onPipePlace(event.block, data)
+//        // Get Near Interaction entity
+//        val entities = event.block.location.add(0.5, 0.0, 0.5).getNearbyEntitiesByType(Interaction::class.java, 0.5)
+//        plugin.logger.info(entities.size.toString())
+//        for (entity in entities) {
+//            plugin.logger.info(entity.uniqueId.toString())
+//        }
+        val success = when (data) {
+            in AKOverlapBlock.REBARS -> {
+                if (plugin.storage.getData(
+                        AKStorage.REBARS,
+                        event.block.location.toBlockLocation().toString()
+                    ) != null
+                ) {
+                    plugin.akOverlapBlock.placeBlockOnBlock(event.itemInHand, event.block.location.toBlockLocation())
+                } else {
+                    plugin.akOverlapBlock.onRebarPlace(event.block, data)
+                }
+            }
+            in AKOverlapBlock.PIPES -> {
+                if (plugin.storage.getData(
+                        AKStorage.PIPES,
+                        event.block.location.toBlockLocation().toString()
+                    ) != null
+                ) {
+                    plugin.akOverlapBlock.placeBlockOnBlock(event.itemInHand, event.block.location.toBlockLocation())
+                } else {
+                    plugin.akOverlapBlock.onPipePlace(event.block, data)
+                }
+            }
+            in AKOverlapBlock.STEEL_FRAMES -> {
+                if (plugin.storage.getData(
+                        AKStorage.STEEL_FRAMES,
+                        event.block.location.toBlockLocation().toString()
+                    ) != null
+                ) {
+                    plugin.akOverlapBlock.placeBlockOnBlock(event.itemInHand, event.block.location.toBlockLocation())
+                } else {
+                    plugin.akOverlapBlock.onFramePlace(event.block, data)
+                }
+            }
+            else -> false
         }
         if (!success) return
         if (event.player.gameMode != GameMode.CREATIVE) event.player.inventory.removeItemAnySlot(plugin.akItem.getItem(data))
@@ -50,12 +87,13 @@ class AKOverlapBlockEvent(private val plugin: ArchKingPlugin) : Listener {
         if (event.entity !is Interaction) return
 
         val data = plugin.storage.getData(AKStorage.REBARS, event.entity.location.toBlockLocation().toString())
-            ?: plugin.storage.getData(AKStorage.PIPES, event.entity.location.toBlockLocation().toString()) ?: return
+            ?: plugin.storage.getData(AKStorage.PIPES, event.entity.location.toBlockLocation().toString())
+            ?: plugin.storage.getData(AKStorage.STEEL_FRAMES, event.entity.location.toBlockLocation().toString())?: return
         val akItemData = data.asJsonObject.get("data").asString.toInt()
         var quantity = 1
         if (akItemData in AKOverlapBlock.REBARS) {
             val rebar =
-                event.entity.world.getEntity(UUID.fromString(data.asJsonObject.get("rebar").asString))!! as BlockDisplay
+                event.entity.world.getEntity(UUID.fromString(data.asJsonObject.get("model").asString))!! as BlockDisplay
 
             quantity = if (akItemData == AKItemType.REBAR_SLAB) {
                 if (rebar.block as? Candle != null) (rebar.block as Candle).candles else 1

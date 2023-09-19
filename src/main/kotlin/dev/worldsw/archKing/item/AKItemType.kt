@@ -11,9 +11,13 @@ class AKItemType {
         const val CONCRETE              = 7
         const val RED_CEMENT            = 99
 
+        const val REBAR                 = 105
         const val REBAR_PILLAR          = 101
         const val REBAR_BEAM            = 102
         const val REBAR_SLAB            = 103
+        const val STEEL_FRAME           = 106
+        const val DECK_PLATE            = 107
+
         const val PIPE                  = 104
     }
 }

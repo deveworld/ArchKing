@@ -32,6 +32,7 @@ class ArchKingPlugin: JavaPlugin(), Listener {
         server.pluginManager.registerEvents(AKOverlapBlockEvent(this), this)
         server.pluginManager.registerEvents(AKGypsumEvent(this), this)
         server.pluginManager.registerEvents(AKBlockEvent(this), this)
+        server.pluginManager.registerEvents(AKFallEvent(this), this)
 
         val voidTabCompleter = TabCompleter { _, _, _, _ -> mutableListOf() }
         val commandList = listOf("archkingitem")
