@@ -16,10 +16,12 @@ class AKPaintEvent(private val plugin: ArchKingPlugin) : Listener {
         if (event.action != Action.RIGHT_CLICK_BLOCK) return
         if (!event.hasItem() || !event.hasBlock()) return
         if (event.item!!.type != Material.WHITE_DYE) return
-        if (plugin.akBlock.getCustomBlockData(event.clickedBlock!!) != AKItemType.CONCRETE) return
-        event.clickedBlock!!.type = Material.WHITE_CONCRETE
-        if (event.player.gameMode != GameMode.CREATIVE) event.player.inventory.removeItemAnySlot(
-            event.item!!.asQuantity(1)
-        )
+
+        if (event.clickedBlock!!.type == Material.BRICKS || plugin.akBlock.getCustomBlockData(event.clickedBlock!!) == AKItemType.CONCRETE) {
+            event.clickedBlock!!.type = Material.WHITE_CONCRETE
+            if (event.player.gameMode != GameMode.CREATIVE) event.player.inventory.removeItemAnySlot(
+                event.item!!.asQuantity(1)
+            )
+        }
     }
 }

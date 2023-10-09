@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "dev.worldsw"
-version = "2.0.0-RC4"
+version = "2.0.0"
 description = "The plugin for the architecture king(YouTuber)."
 
 repositories {
@@ -20,7 +20,7 @@ java {
 }
 
 dependencies {
-    paperweight.paperDevBundle("1.20.1-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.20.2-R0.1-SNAPSHOT")
 
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
@@ -50,7 +50,7 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.20.1")
+        minecraftVersion("1.20.2")
         jvmArgs("-Dcom.mojang.eula.agree=true")
     }
 
