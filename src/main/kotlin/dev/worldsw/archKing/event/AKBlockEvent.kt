@@ -69,18 +69,7 @@ class AKBlockEvent(private val plugin: ArchKingPlugin) : Listener {
      */
     @EventHandler
     fun onEntityChangeBlockEvent(event: EntityChangeBlockEvent) {
-        if (event.entityType != EntityType.FALLING_BLOCK) return
-        val dataAKItemType = plugin.akBlock.getCustomBlockData(event.block)
-        if (dataAKItemType == null) {
-            plugin.akBlock.placeAKItem(event.entity.persistentDataContainer, event.block)
-        } else {
-            plugin.akBlock.removeCustomBlockData(event.block)
-            event.entity.persistentDataContainer.set(
-                NamespacedKey(plugin, AKItem.CUSTOM_ITEM),
-                PersistentDataType.INTEGER,
-                dataAKItemType
-            )
-        }
+        plugin.akBlock.fallAKBlock(event.block, event.entity)
     }
     @EventHandler
     fun onEntityDropItemEvent(event: EntityDropItemEvent) {

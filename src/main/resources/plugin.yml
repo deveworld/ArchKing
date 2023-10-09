@@ -6,15 +6,23 @@ author: devworld
 api-version: "$apiVersion"
 
 permissions :
-  archkingitem.get:
+  akitem.get:
     description: "This is a permission to get arch king item"
+    default: op
+  akgravity.set:
+    description: "This is a permission to change gravity"
     default: op
 
 commands:
-  archkingitem:
+  akitem:
     description: "Get arch king item"
-    usage: "/archkingitem <item> <quantity>"
-    permission: archkingitem.get
+    usage: "/akitem <item> <quantity>"
+    permission: akitem.get
+    permission-message: "You do not have permission to use this command"
+  akgravity:
+    description: "Toggle gravity"
+    usage: "/akgravity (wood,concrete)"
+    permission: akgravity.set
     permission-message: "You do not have permission to use this command"
 
 bootstrapper: dev.worldsw.archKing.ArchKingBootstrap
