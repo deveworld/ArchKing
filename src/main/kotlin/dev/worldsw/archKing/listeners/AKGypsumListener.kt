@@ -1,4 +1,4 @@
-package dev.worldsw.archKing.event
+package dev.worldsw.archKing.listeners
 
 import dev.worldsw.archKing.ArchKingPlugin
 import dev.worldsw.archKing.item.AKItemType
