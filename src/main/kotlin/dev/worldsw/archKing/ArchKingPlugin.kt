@@ -12,13 +12,16 @@ import org.bukkit.command.TabCompleter
 import org.bukkit.plugin.java.JavaPlugin
 
 class ArchKingPlugin: JavaPlugin(){
+
+    companion object{
+        lateinit var instance:ArchKingPlugin
+            private set
+    }
+
     lateinit var storage: AKStorage
     lateinit var akItem: AKItem
     lateinit var akBlock: AKBlock
     lateinit var akOverlapBlock: AKOverlapBlock
-
-    lateinit var instance:ArchKingPlugin
-        private set
 
     override fun onEnable() {
 
