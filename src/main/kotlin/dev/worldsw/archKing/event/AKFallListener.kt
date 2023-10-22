@@ -12,7 +12,7 @@ import org.bukkit.event.block.BlockPlaceEvent
 
 class AKFallListener(private val plugin: ArchKingPlugin) : Listener {
     @EventHandler
-    fun onBlockPlaceEvent(event: BlockPlaceEvent) {
+    fun onBlockPlace(event: BlockPlaceEvent) {
         if (event.block.getRelative(BlockFace.DOWN).type != Material.AIR) return
 
         val wood = plugin.storage.getData(AKStorage.GRAVITY, AKStorage.WOOD_GRAVITY)!!.asBoolean
