@@ -18,12 +18,12 @@ import org.bukkit.event.entity.EntityDropItemEvent
 import org.bukkit.persistence.PersistentDataType
 
 
-class AKBlockEvent(private val plugin: ArchKingPlugin) : Listener {
+class AKBlockListener(private val plugin: ArchKingPlugin) : Listener {
     /**
      * On Place AKBlock
      */
     @EventHandler
-    fun onBlockPlaceEvent(event: BlockPlaceEvent) {
+    fun onBlockPlace(event: BlockPlaceEvent) {
         plugin.akBlock.placeAKItem(event.itemInHand.itemMeta.persistentDataContainer, event.block)
     }
 
@@ -31,11 +31,11 @@ class AKBlockEvent(private val plugin: ArchKingPlugin) : Listener {
      * On Move AKBlock
      */
     @EventHandler
-    fun onBlockPistonExtendEvent(event: BlockPistonExtendEvent) {
+    fun onBlockPistonExtend(event: BlockPistonExtendEvent) {
         for (block in event.blocks) plugin.akBlock.moveAKBlock(block, event.direction)
     }
     @EventHandler
-    fun onBlockPistonExtendEvent(event: BlockPistonRetractEvent) {
+    fun onBlockPistonExtend(event: BlockPistonRetractEvent) {
         for (block in event.blocks) plugin.akBlock.moveAKBlock(block, event.direction)
     }
 
@@ -43,7 +43,7 @@ class AKBlockEvent(private val plugin: ArchKingPlugin) : Listener {
      * On Break AKBlock
      */
     @EventHandler
-    fun onBlockBreakEvent(event: BlockBreakEvent) {
+    fun onBlockBreak(event: BlockBreakEvent) {
         if (!event.isDropItems) return
         if (!plugin.akBlock.isAKBlock(event.block)) return
 
@@ -58,7 +58,7 @@ class AKBlockEvent(private val plugin: ArchKingPlugin) : Listener {
         plugin.akBlock.breakBlock(event.block, dropItem)
     }
     @EventHandler
-    fun onBlockBreakBlockEvent(event: BlockBreakBlockEvent) {
+    fun onBlockBreakBlock(event: BlockBreakBlockEvent) {
         if (event.drops.size == 0) return
         event.block.drops.clear()
         plugin.akBlock.breakBlock(event.block)
@@ -68,11 +68,11 @@ class AKBlockEvent(private val plugin: ArchKingPlugin) : Listener {
      * On Fall AKBlock
      */
     @EventHandler
-    fun onEntityChangeBlockEvent(event: EntityChangeBlockEvent) {
+    fun onEntityChangeBlock(event: EntityChangeBlockEvent) {
         plugin.akBlock.fallAKBlock(event.block, event.entity)
     }
     @EventHandler
-    fun onEntityDropItemEvent(event: EntityDropItemEvent) {
+    fun onEntityDropItem(event: EntityDropItemEvent) {
         if (event.entityType != EntityType.FALLING_BLOCK) return
         val dataAKItemType = event.entity.persistentDataContainer.getOrDefault(
             NamespacedKey(plugin, AKItem.CUSTOM_ITEM),
