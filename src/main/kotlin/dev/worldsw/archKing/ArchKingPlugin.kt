@@ -33,7 +33,7 @@ class ArchKingPlugin: JavaPlugin(), Listener {
         server.pluginManager.registerEvents(AKGypsumListener(this), this)
         server.pluginManager.registerEvents(AKBlockListener(this), this)
         server.pluginManager.registerEvents(AKFallListener(this), this)
-        server.pluginManager.registerEvents(AKPaintEvent(this), this)
+        server.pluginManager.registerEvents(AKPaintListener(this), this)
 
         val voidTabCompleter = TabCompleter { _, _, _, _ -> mutableListOf() }
         val commandList = listOf("akitem", "akgravity")
