@@ -8,12 +8,12 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.EventHandler
 
-class AKGypsumEvent(private val plugin: ArchKingPlugin) : Listener {
+class AKGypsumListener(private val plugin: ArchKingPlugin) : Listener {
     /**
      * Change AMETHYST_SHARD to GYPSUM
      */
     @EventHandler
-    fun onEntityPickupItemEvent(event: EntityPickupItemEvent) {
+    fun onEntityPickupItem(event: EntityPickupItemEvent) {
         if (event.entity !is Player) return
         if (event.item.itemStack.type == Material.AMETHYST_SHARD) event.item.itemStack = plugin.akItem
             .getItem(AKItemType.GYPSUM, event.item.itemStack.amount)
