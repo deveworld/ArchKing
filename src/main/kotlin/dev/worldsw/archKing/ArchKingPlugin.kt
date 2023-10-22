@@ -29,7 +29,7 @@ class ArchKingPlugin: JavaPlugin(), Listener {
 
         server.pluginManager.registerEvents(this, this)
         server.pluginManager.registerEvents(AKStorageEvent(this), this)
-        server.pluginManager.registerEvents(AKOverlapBlockEvent(this), this)
+        server.pluginManager.registerEvents(AKOverlapBlockListener(this), this)
         server.pluginManager.registerEvents(AKGypsumListener(this), this)
         server.pluginManager.registerEvents(AKBlockListener(this), this)
         server.pluginManager.registerEvents(AKFallListener(this), this)
