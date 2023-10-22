@@ -18,7 +18,13 @@ class ArchKingPlugin: JavaPlugin(){
     lateinit var akBlock: AKBlock
     lateinit var akOverlapBlock: AKOverlapBlock
 
+    lateinit var instance:ArchKingPlugin
+        private set
+
     override fun onEnable() {
+
+        instance = this
+
         storage = AKStorage(this)
 
         storage.init()
