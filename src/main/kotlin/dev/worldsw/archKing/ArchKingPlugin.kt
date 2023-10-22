@@ -32,7 +32,7 @@ class ArchKingPlugin: JavaPlugin(), Listener {
         server.pluginManager.registerEvents(AKOverlapBlockEvent(this), this)
         server.pluginManager.registerEvents(AKGypsumEvent(this), this)
         server.pluginManager.registerEvents(AKBlockListener(this), this)
-        server.pluginManager.registerEvents(AKFallEvent(this), this)
+        server.pluginManager.registerEvents(AKFallListener(this), this)
         server.pluginManager.registerEvents(AKPaintEvent(this), this)
 
         val voidTabCompleter = TabCompleter { _, _, _, _ -> mutableListOf() }

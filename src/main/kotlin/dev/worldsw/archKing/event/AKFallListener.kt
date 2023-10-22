@@ -10,7 +10,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.EventHandler
 import org.bukkit.event.block.BlockPlaceEvent
 
-class AKFallEvent(private val plugin: ArchKingPlugin) : Listener {
+class AKFallListener(private val plugin: ArchKingPlugin) : Listener {
     @EventHandler
     fun onBlockPlaceEvent(event: BlockPlaceEvent) {
         if (event.block.getRelative(BlockFace.DOWN).type != Material.AIR) return
