@@ -28,12 +28,23 @@ class ArchKingPlugin: JavaPlugin(){
         AKRecipe(this)
 
 //        server.pluginManager.registerEvents(this, this)
-        server.pluginManager.registerEvents(AKStorageListener(this), this)
-        server.pluginManager.registerEvents(AKOverlapBlockListener(this), this)
-        server.pluginManager.registerEvents(AKGypsumListener(this), this)
-        server.pluginManager.registerEvents(AKBlockListener(this), this)
-        server.pluginManager.registerEvents(AKFallListener(this), this)
-        server.pluginManager.registerEvents(AKPaintListener(this), this)
+//        server.pluginManager.registerEvents(AKStorageListener(this), this)
+//        server.pluginManager.registerEvents(AKOverlapBlockListener(this), this)
+//        server.pluginManager.registerEvents(AKGypsumListener(this), this)
+//        server.pluginManager.registerEvents(AKBlockListener(this), this)
+//        server.pluginManager.registerEvents(AKFallListener(this), this)
+//        server.pluginManager.registerEvents(AKPaintListener(this), this)
+
+        listOf(
+            AKStorageListener(this),
+            AKOverlapBlockListener(this),
+            AKGypsumListener(this),
+            AKBlockListener(this),
+            AKFallListener(this),
+            AKPaintListener(this)
+        ).forEach{listener ->
+            server.pluginManager.registerEvents(listener, this)
+        }
 
         val voidTabCompleter = TabCompleter { _, _, _, _ -> mutableListOf() }
         val commandList = listOf("akitem", "akgravity")
