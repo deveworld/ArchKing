@@ -12,7 +12,7 @@ import org.bukkit.command.TabCompleter
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 
-class ArchKingPlugin: JavaPlugin(), Listener {
+class ArchKingPlugin: JavaPlugin(){
     lateinit var storage: AKStorage
     lateinit var akItem: AKItem
     lateinit var akBlock: AKBlock
@@ -27,7 +27,7 @@ class ArchKingPlugin: JavaPlugin(), Listener {
         akOverlapBlock = AKOverlapBlock(this)
         AKRecipe(this)
 
-        server.pluginManager.registerEvents(this, this)
+//        server.pluginManager.registerEvents(this, this)
         server.pluginManager.registerEvents(AKStorageListener(this), this)
         server.pluginManager.registerEvents(AKOverlapBlockListener(this), this)
         server.pluginManager.registerEvents(AKGypsumListener(this), this)
