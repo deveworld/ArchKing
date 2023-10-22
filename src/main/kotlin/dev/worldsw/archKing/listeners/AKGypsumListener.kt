@@ -4,9 +4,9 @@ import dev.worldsw.archKing.ArchKingPlugin
 import dev.worldsw.archKing.item.AKItemType
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityPickupItemEvent
-import org.bukkit.event.EventHandler
 
 class AKGypsumListener(private val plugin: ArchKingPlugin) : Listener {
     /**
