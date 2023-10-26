@@ -1,4 +1,4 @@
-package dev.worldsw.archKing.event
+package dev.worldsw.archKing.listeners
 
 import dev.worldsw.archKing.ArchKingPlugin
 import dev.worldsw.archKing.item.AKItemType
@@ -9,9 +9,9 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 
-class AKPaintEvent(private val plugin: ArchKingPlugin) : Listener {
+class AKPaintListener(private val plugin: ArchKingPlugin) : Listener {
     @EventHandler
-    fun onPlayerInteractEvent(event: PlayerInteractEvent) {
+    fun onPlayerInteract(event: PlayerInteractEvent) {
         if (event.isBlockInHand) return
         if (event.action != Action.RIGHT_CLICK_BLOCK) return
         if (!event.hasItem() || !event.hasBlock()) return

@@ -1,4 +1,4 @@
-package dev.worldsw.archKing.event
+package dev.worldsw.archKing.listeners
 
 import dev.worldsw.archKing.ArchKingPlugin
 import dev.worldsw.archKing.block.AKOverlapBlock
@@ -22,10 +22,10 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.persistence.PersistentDataType
 import java.util.*
 
-class AKOverlapBlockEvent(private val plugin: ArchKingPlugin) : Listener {
+class AKOverlapBlockListener(private val plugin: ArchKingPlugin) : Listener {
 
     @EventHandler
-    fun onBlockPlaceEvent(event: BlockPlaceEvent) {
+    fun onBlockPlace(event: BlockPlaceEvent) {
         val data = event.itemInHand.itemMeta.persistentDataContainer.getOrDefault(
             NamespacedKey(plugin, AKItem.CUSTOM_ITEM),
             PersistentDataType.INTEGER,
@@ -82,7 +82,7 @@ class AKOverlapBlockEvent(private val plugin: ArchKingPlugin) : Listener {
     }
 
     @EventHandler
-    fun onEntityDamageByEntityEvent(event: EntityDamageByEntityEvent) {
+    fun onEntityDamageByEntity(event: EntityDamageByEntityEvent) {
         if (event.damager !is Player) return
         if (event.entity !is Interaction) return
 
@@ -114,7 +114,7 @@ class AKOverlapBlockEvent(private val plugin: ArchKingPlugin) : Listener {
     }
 
     @EventHandler
-    fun onPlayerInteractAtEntityEvent(event: PlayerInteractAtEntityEvent) {
+    fun onPlayerInteractAtEntity(event: PlayerInteractAtEntityEvent) {
         if (event.rightClicked.type != EntityType.INTERACTION) return
 
         var location = event.rightClicked.location

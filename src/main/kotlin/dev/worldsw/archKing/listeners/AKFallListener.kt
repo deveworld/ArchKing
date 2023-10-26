@@ -1,4 +1,4 @@
-package dev.worldsw.archKing.event
+package dev.worldsw.archKing.listeners
 
 import dev.worldsw.archKing.ArchKingPlugin
 import dev.worldsw.archKing.data.AKStorage
@@ -6,13 +6,13 @@ import dev.worldsw.archKing.item.AKItemType
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
-import org.bukkit.event.Listener
 import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockPlaceEvent
 
-class AKFallEvent(private val plugin: ArchKingPlugin) : Listener {
+class AKFallListener(private val plugin: ArchKingPlugin) : Listener {
     @EventHandler
-    fun onBlockPlaceEvent(event: BlockPlaceEvent) {
+    fun onBlockPlace(event: BlockPlaceEvent) {
         if (event.block.getRelative(BlockFace.DOWN).type != Material.AIR) return
 
         val wood = plugin.storage.getData(AKStorage.GRAVITY, AKStorage.WOOD_GRAVITY)!!.asBoolean
