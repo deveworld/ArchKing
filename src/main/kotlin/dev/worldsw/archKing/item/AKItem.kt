@@ -12,43 +12,16 @@ import kotlin.reflect.full.companionObject
 import kotlin.reflect.full.memberProperties
 
 class AKItem(private val plugin: ArchKingPlugin) {
-    private var lime: ItemStack = ItemStack(Material.SUGAR); private var cementPowder: ItemStack
-    private var cementClinker: ItemStack; private var cement: ItemStack
-    private var readyMixedConcrete: ItemStack; private var redCement: ItemStack
-    private var gypsum: ItemStack; private var concrete: ItemStack
 
-    private var rebar: ItemStack; private var rebarPillar: ItemStack
-    private var rebarBeam: ItemStack; private var rebarSlab: ItemStack
-    private var steelFrame: ItemStack; private var deckPlate: ItemStack
-
-    private var pipe: ItemStack
 
     companion object {
         const val CUSTOM_ITEM           = "ArchKingItem"
         const val NOT_CUSTOM_ITEM       = 0
     }
 
-    fun getItem(item: Int, quantity: Int = 1): ItemStack {
-        return when (item) {
-            AKItemType.LIME ->                     lime.asQuantity(quantity)
-            AKItemType.CEMENT_POWDER ->            cementPowder.asQuantity(quantity)
-            AKItemType.CEMENT_CLINKER ->           cementClinker.asQuantity(quantity)
-            AKItemType.CEMENT ->                   cement.asQuantity(quantity)
-            AKItemType.READY_MIXED_CONCRETE ->     readyMixedConcrete.asQuantity(quantity)
-            AKItemType.RED_CEMENT ->               redCement.asQuantity(quantity)
-            AKItemType.GYPSUM ->                   gypsum.asQuantity(quantity)
-            AKItemType.CONCRETE ->                 concrete.asQuantity(quantity)
-
-            AKItemType.REBAR ->                    rebar.asQuantity(quantity)
-            AKItemType.STEEL_FRAME ->              steelFrame.asQuantity(quantity)
-            AKItemType.REBAR_PILLAR ->             rebarPillar.asQuantity(quantity)
-            AKItemType.REBAR_BEAM ->               rebarBeam.asQuantity(quantity)
-            AKItemType.REBAR_SLAB ->               rebarSlab.asQuantity(quantity)
-            AKItemType.DECK_PLATE ->               deckPlate.asQuantity(quantity)
-
-            AKItemType.PIPE ->                     pipe.asQuantity(quantity)
-            else ->                                ItemStack(Material.AIR)
-        }
+    private val items = HashMap<Int, ItemStack>()
+    fun getItem(item:Int, quantity:Int = 1):ItemStack{
+        return items[item]?.asQuantity(quantity)?:ItemStack(Material.AIR)
     }
 
     fun getAllProperties(): List<String> {
@@ -81,125 +54,35 @@ class AKItem(private val plugin: ArchKingPlugin) {
     }
 
     init {
-        lime = ItemStack(Material.SUGAR)
-        lime.editMeta {
-            it.displayName(Component.text("석회").decoration(TextDecoration.ITALIC, false))
-            it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
-                AKItemType.LIME
-            )
-        }
+        listOf(
+            Triple(Material.SUGAR, "석회", AKItemType.LIME),
+            Triple(Material.GUNPOWDER, "시멘트 가루", AKItemType.CEMENT_POWDER),
+            Triple(Material.LIGHT_GRAY_CONCRETE_POWDER, "시멘트 클린커", AKItemType.CEMENT_CLINKER),
+            Triple(Material.WHITE_CONCRETE_POWDER, "시멘트", AKItemType.CEMENT),
+            Triple(Material.GRAY_CONCRETE_POWDER, "레미콘", AKItemType.READY_MIXED_CONCRETE),
+            Triple(Material.RED_CONCRETE_POWDER, "피가 묻은 시멘트", AKItemType.RED_CEMENT),
+            Triple(Material.AMETHYST_SHARD, "석고", AKItemType.GYPSUM),
+            Triple(Material.LIGHT_GRAY_CONCRETE, "콘크리트", AKItemType.CONCRETE),
+            Triple(Material.SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE, "철근", AKItemType.REBAR), // ItemFlag Hide ITEM
+            Triple(Material.RED_NETHER_BRICK_WALL, "철근 기둥", AKItemType.REBAR_PILLAR),
+            Triple(Material.RED_NETHER_BRICK_WALL, "철근 보", AKItemType.REBAR_BEAM),
+            Triple(Material.MAGENTA_CANDLE, "철근 슬래브", AKItemType.REBAR_SLAB),
+            Triple(Material.MUD_BRICK_WALL, "강관", AKItemType.PIPE),
+            Triple(Material.NETHER_BRICK_WALL, "철골", AKItemType.STEEL_FRAME),
+            Triple(Material.IRON_TRAPDOOR, "데크플레이트", AKItemType.DECK_PLATE)
+        ).forEach{
+            items[it.third] = ItemStack(it.first).apply {
+                editMeta {meta ->
+                    meta.displayName(Component.text(it.second).decoration(TextDecoration.ITALIC, false))
+                    meta.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
+                        it.third
+                    )
 
-        cementPowder = ItemStack(Material.GUNPOWDER)
-        cementPowder.editMeta {
-            it.displayName(Component.text("시멘트 가루").decoration(TextDecoration.ITALIC, false))
-            it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
-                AKItemType.CEMENT_POWDER
-            )
+                }
+            }
         }
+        items[AKItemType.REBAR]!!.editMeta{it.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS)}
 
-        cementClinker = ItemStack(Material.LIGHT_GRAY_CONCRETE_POWDER)
-        cementClinker.editMeta {
-            it.displayName(Component.text("시멘트 클린커").decoration(TextDecoration.ITALIC, false))
-            it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
-                AKItemType.CEMENT_CLINKER
-            )
-        }
 
-        cement = ItemStack(Material.WHITE_CONCRETE_POWDER)
-        cement.editMeta {
-            it.displayName(Component.text("시멘트").decoration(TextDecoration.ITALIC, false))
-            it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
-                AKItemType.CEMENT
-            )
-        }
-
-        readyMixedConcrete = ItemStack(Material.GRAY_CONCRETE_POWDER)
-        readyMixedConcrete.editMeta {
-            it.displayName(Component.text("레미콘").decoration(TextDecoration.ITALIC, false))
-            it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
-                AKItemType.READY_MIXED_CONCRETE
-            )
-        }
-
-        redCement = ItemStack(Material.RED_CONCRETE_POWDER)
-        redCement.editMeta {
-            it.displayName(Component.text("피가 묻은 시멘트").decoration(TextDecoration.ITALIC, false))
-            it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
-                AKItemType.RED_CEMENT
-            )
-        }
-
-        gypsum = ItemStack(Material.AMETHYST_SHARD)
-        gypsum.editMeta {
-            it.displayName(Component.text("석고").decoration(TextDecoration.ITALIC, false))
-            it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
-                AKItemType.GYPSUM
-            )
-        }
-
-        concrete = ItemStack(Material.LIGHT_GRAY_CONCRETE)
-        concrete.editMeta {
-            it.displayName(Component.text("콘크리트").decoration(TextDecoration.ITALIC, false))
-            it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
-                AKItemType.CONCRETE
-            )
-        }
-
-        rebar = ItemStack(Material.SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE)
-        rebar.editMeta {
-            it.displayName(Component.text("철근").decoration(TextDecoration.ITALIC, false))
-            it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
-                AKItemType.REBAR
-            )
-            it.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS)
-        }
-
-        rebarPillar = ItemStack(Material.RED_NETHER_BRICK_WALL)
-        rebarPillar.editMeta {
-            it.displayName(Component.text("철근 기둥").decoration(TextDecoration.ITALIC, false))
-            it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
-                AKItemType.REBAR_PILLAR
-            )
-        }
-
-        rebarBeam = ItemStack(Material.RED_NETHER_BRICK_WALL)
-        rebarBeam.editMeta {
-            it.displayName(Component.text("철근 보").decoration(TextDecoration.ITALIC, false))
-            it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
-                AKItemType.REBAR_BEAM
-            )
-        }
-
-        rebarSlab = ItemStack(Material.MAGENTA_CANDLE)
-        rebarSlab.editMeta {
-            it.displayName(Component.text("철근 슬래브").decoration(TextDecoration.ITALIC, false))
-            it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
-                AKItemType.REBAR_SLAB
-            )
-        }
-
-        pipe = ItemStack(Material.MUD_BRICK_WALL)
-        pipe.editMeta {
-            it.displayName(Component.text("강관").decoration(TextDecoration.ITALIC, false))
-            it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
-                AKItemType.PIPE
-            )
-        }
-
-        steelFrame = ItemStack(Material.NETHER_BRICK_WALL)
-        steelFrame.editMeta {
-            it.displayName(Component.text("철골").decoration(TextDecoration.ITALIC, false))
-            it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
-                AKItemType.STEEL_FRAME
-            )
-        }
-
-        deckPlate = ItemStack(Material.IRON_TRAPDOOR)
-        deckPlate.editMeta {
-            it.displayName(Component.text("데크플레이트").decoration(TextDecoration.ITALIC, false))
-            it.persistentDataContainer.set(NamespacedKey(plugin, CUSTOM_ITEM), PersistentDataType.INTEGER,
-                AKItemType.DECK_PLATE
-            )
-        }
     }
 }
